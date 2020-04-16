@@ -65,13 +65,13 @@ combined_feature_serial_name = "CNN_prob_combined_features"
 
 
 # Combining directories into absolute paths which functions can use
-initial_data_file = "MasterFraudData_more datav2.xlsx"
+
 init_data_path = os.path.abspath(os.path.join(current_dir, initial_data_dir))
-fraud_data_path = os.path.join(init_data_path, initial_data_file)
 
-gis_file_name = "GIS_Fraud_Data_Full.xlsx"
+initial_large_data_df = os.path.join(init_data_path, "FraudData_Init.pk")
+
+gis_file_name = "GIS_Data.pk"
 gis_data_path = os.path.join(init_data_path, gis_file_name)
-
 
 
 combined_feature_xlsx_path = os.path.join(feature_gen_data_dir, combined_feature_file_name)
@@ -692,14 +692,10 @@ def create_Body_Parts_Feature(initial_df_row):
 def get_subline_business(fraud_data):
 
 
+    with open(gis_data_path, 'rb') as read:
+        gis_fraud_df = dill.load(read)
 
-    gis_fraud_df = pd.read_excel(gis_data_path, usecols= [0,2,8 ],
-                                na_values=["NULL", '', "", " ", "N/A", "null", "#N/A", "NULL"],
-                                 dtype = {
-                                          'CLAIM_NUM': str,
-                                          'FEATURE': str,
-                                          'SUBLINE_OF_BUSINESS_DS': str
-                                        })
+
 
     fraud_claimNum = fraud_data['Claim Number']
     first_claim = list(fraud_claimNum + "-001")
@@ -776,28 +772,13 @@ def get_Fraud_Dataset(**kwargs):
             # if (os.path.exists(text_feature_fraud_path)):
             #     os.remove(text_feature_fraud_path)
 
-        # loop to generate list of indices which will be used to keep certain columsn
-        col_keep_indices = []
-        for col_index in range(19):
-            col_keep_indices.append(col_index)
 
-        # Grabbing the dataset from excel (only first 18 columns)
-        initial_large_data_df = pd.read_excel(fraud_data_path, usecols = col_keep_indices,
-                                 na_values=["NULL", '', "", " ", "N/A", "null", "#N/A", "NULL"],
-                                 dtype = {
-                                          'Fraud Acceptance': str,
-                                          'Loss_Description': str,
-                                          'Loss  City': str, 'LOSS_LOCATION_STATE': str,
-                                          'LOSS_LOCATION_ZIP': str,
-                                          'Loss Date': np.datetime64, 'Loss Time': np.datetime64,
-                                          'Main Cause': str, 'Sub Cause': str,
-                                          'Policy Eff Date': np.datetime64, 'Policy Exp Date': np.datetime64,
-                                          'Claim Create Date': np.datetime64, 'Claim Receipt Date':  np.datetime64
-                                        }
-                                )
+
+
+        with open(initial_large_data_df, 'rb') as read:
+            initial_large_data_df = dill.load(fraud_serial_path)
 
         print("Initial Large dataframe size before drop {}\n".format(len(initial_large_data_df)))
-
 
         if fraud_type == 'acceptance':
             # Dropping rows that are labelled 'not applicable', only focusing on 'accepted' and 'rejected' labels
@@ -851,21 +832,14 @@ def get_Fraud_Dataset(**kwargs):
 
         # feature_data_df = feature_data_df.drop(['Unnamed: 0'], axis=1)
 
-        with pd.ExcelWriter(feature_gen_data_path) as xlsx_writer:
-            feature_data_df.to_excel(xlsx_writer, 'Fraud_{}'.format(text_feature_type), header=True, index_label= False)
-            xlsx_writer.save()
+        # with pd.ExcelWriter(feature_gen_data_path) as xlsx_writer:
+        #     feature_data_df.to_excel(xlsx_writer, 'Fraud_{}'.format(text_feature_type), header=True, index_label= False)
+        #     xlsx_writer.save()
 
         with open(feature_serial_path, 'wb') as write:
             dill.dump(feature_data_df, write)
 
 
-        # if (recreate_features == True) :
-        #     with open(text_feature_fraud_path, 'wb') as write:
-        #         dill.dump(feature_data_df['Fraud_Text'], write)
-
-            # with pd.ExcelWriter(text_xlsx_path) as xlsx_writer:
-            #     feature_data_df.to_excel(xlsx_writer, 'Cleaned_Text_Feature', header=True, index_label= False)
-            #     xlsx_writer.save()
 
 
 
@@ -942,23 +916,6 @@ def feature_Generation_Init_Data(initial_Dateset, correct_spell, text_feat_path)
 
 
 
-            # =========================  ADDING LOSS DATE/TIME ====================================
-            # current_loss_time = str(initial_Dateset.loc[index ,"Loss Time"])
-            # current_loss_date = str(initial_Dateset.loc[index ,"Loss Date"])
-            # # Adding loss datetime data to text feature
-            # if(current_loss_time.find("NULL") == -1) or (current_loss_time.lower() == 'nan') :
-            #
-            #     if (current_loss_time.lower() != 'nan'):
-            #
-            #         initial_Dateset.loc[index ,"Loss_Description"] +=  ", the loss occurred at the following date and time: " + str(initial_Dateset.loc[index ,"Loss Time"])
-            #
-            #
-            #     elif (current_loss_time.lower() == 'nan'):
-            #         initial_Dateset.loc[index ,"Loss_Description"]  +=  ", the loss occurred at the following date: " + str( initial_Dateset.loc[index ,"Loss Date"] )
-            #
-            # else:
-            #     initial_Dateset.loc[index ,"Loss_Description"]  +=  ", the loss occurred at the following date: " + str( initial_Dateset.loc[index ,"Loss Date"] )
-            # =============================================================
 
             # adding injury damage and body part description to text feature if it is not null
             current_injury = str(initial_Dateset.loc[index ,"Injury Damage"])
@@ -1018,9 +975,9 @@ def feature_Generation_Init_Data(initial_Dateset, correct_spell, text_feat_path)
         with open(text_feat_path, 'wb') as write:
             dill.dump(new_text_feature_df, write)
 
-        with pd.ExcelWriter(text_xlsx_path) as xlsx_writer:
-            new_text_feature_df.to_excel(xlsx_writer, "{}_Text_Feature".format(text_feature_type), header=True, index_label= False)
-            xlsx_writer.save()
+        # with pd.ExcelWriter(text_xlsx_path) as xlsx_writer:
+        #     new_text_feature_df.to_excel(xlsx_writer, "{}_Text_Feature".format(text_feature_type), header=True, index_label= False)
+        #     xlsx_writer.save()
 
 
 
