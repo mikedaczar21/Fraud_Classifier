@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <h1>Fraud Classifier Results</h1>
+  <article class="media content-section">
+         <div class="media-body">
+           <div class="article-metadata">
+             <h2 ><b> Results For  {{ model_type }}  </b></h2>
+           </div>
+         </div>
+       </article>
+
+  <table class="table table-hover">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col"> Cleaned Loss Description</th>
+        <!-- <th  scope="col"> Loss Date</th>
+        <th  scope="col"> Policy Effective Date</th>
+        <th  scope="col"> Policy Expiration Date</th> -->
+        <!-- <th scope="col"> Actual </th> -->
+        <th scope="col"> Prediction</th>
+        <th scope="col"> Confidence Score (0-100) </th>
+      </tr>
+    </thead>
+
+
+
+      {% for elem in range(num_pred) %}
+      <tr>
+
+
+          <td class="col-md-6"> <p style="font-size:10; ">{{ feature[elem] }} </p> </td>
+
+          <td> {{ pred[elem] }} </td>
+          <td class="col-md-4"> {{ prob[elem] }} </td>
+
+        </tr>
+        <tr>
+          <td class="col-md-16">
+              <img src= " {{ url_for('static', filename= dec_plots[elem] ) }}  " class="img-fluid" alt="Responsive image">
+
+           </td>
+        </tr>
+
+       {% endfor %}
+
+
+
+  </table>
+
+
+
+
+{% endblock content %}

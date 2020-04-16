@@ -1,0 +1,6 @@
+model_checkpoint_path: "C:\\Current_Projects\\Fraud_Project_AI\\Trained_CNN_Text_Classifier\\1layer\\Saved_Models\\1582930097_100d_0.7drop_100f_0.08L2_0.008learn_Accept_8kVocab\\checkpoints\\CNN_model-5400"
+all_model_checkpoint_paths: "C:\\Current_Projects\\Fraud_Project_AI\\Trained_CNN_Text_Classifier\\1layer\\Saved_Models\\1582930097_100d_0.7drop_100f_0.08L2_0.008learn_Accept_8kVocab\\checkpoints\\CNN_model-4200"
+all_model_checkpoint_paths: "C:\\Current_Projects\\Fraud_Project_AI\\Trained_CNN_Text_Classifier\\1layer\\Saved_Models\\1582930097_100d_0.7drop_100f_0.08L2_0.008learn_Accept_8kVocab\\checkpoints\\CNN_model-4500"
+all_model_checkpoint_paths: "C:\\Current_Projects\\Fraud_Project_AI\\Trained_CNN_Text_Classifier\\1layer\\Saved_Models\\1582930097_100d_0.7drop_100f_0.08L2_0.008learn_Accept_8kVocab\\checkpoints\\CNN_model-4800"
+all_model_checkpoint_paths: "C:\\Current_Projects\\Fraud_Project_AI\\Trained_CNN_Text_Classifier\\1layer\\Saved_Models\\1582930097_100d_0.7drop_100f_0.08L2_0.008learn_Accept_8kVocab\\checkpoints\\CNN_model-5100"
+all_model_checkpoint_paths: "C:\\Current_Projects\\Fraud_Project_AI\\Trained_CNN_Text_Classifier\\1layer\\Saved_Models\\1582930097_100d_0.7drop_100f_0.08L2_0.008learn_Accept_8kVocab\\checkpoints\\CNN_model-5400"

@@ -1,0 +1,28 @@
+
+<html>
+<head>
+<style>
+body {background-color: white;}
+h1   {color: black; font-family:"Palatino Linotype", "Book Antiqua", Palatino, serif ; font-size: 200%;}
+p    {color: black; font-family:"Palatino Linotype", "Book Antiqua", Palatino, serif ; font-size: 100%; }
+</style>
+</head>
+
+<body>
+<h1>Fraud Classifier</h1>
+<form action = "http://localhost:80/predict" method = "POST">
+<form>
+<p><b>Select a model to run:</b></p>
+  <input type="radio" name= "model" value="bayes" /checked> Bayes</input><br>
+  <input type="radio" name= "model" value="bayes_glove"> Bayes Glove </input><br>
+  <input type="radio" name= "model" value="svm"> SVM </input><br>
+  <input type="radio" name= "model" value="svm_glove"> SVM Glove </input><br>
+  <input type="radio" name= "model" value="svm_word2vec"> SVM Word2Vector </input><br>
+  <input type="radio" name= "model" value="tree_glove"> Tree Glove </input><br>
+  <input type="radio" name= "model" value="tree_word2vec"/> Tree Word2Vector </input><br>
+  <input type="radio" name= "model" value="cnn_1layer"/> CNN - 1 layer </input><br>
+<p><b> Claim Description:</b> <input type = "text" name = "Claim" /></p>
+<p><input type = "submit" value = "Submit" /></p>
+</form>
+</body>
+</html>

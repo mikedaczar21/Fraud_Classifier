@@ -1,0 +1,38 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+  <h1>Fraud Classifier</h1>
+  <form action = "http://localhost:80/predict" method = "POST">
+  <form>
+  <div class="container">
+
+    <div class="row">
+
+      <div class="col-lg">
+        <!-- <input type="radio" name= "model" value="etree"/> Extra Tree Random Forest <br> -->
+        <!-- <input type="radio" name= "model" value="cnn_1layer" style="position: fixed; opacity:0;"/> CNN (1 layer) <br> -->
+        <input type="radio" name= "model" value="xgboost" style="position: fixed; opacity:0;" checked />
+        <h4 >XGBoost</h4>  <br><br>
+        <input type="file" name="fraud_data"></input><br>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-lg">
+        <br>
+          <p><input type = "submit" value = "Submit" /></p>
+      </div>
+    </div>
+
+  </div>
+  <!-- <p><b>Select a model:</b></p>
+
+    <input type="radio" name= "model" value="etree"/> Extra Tree Random Forest <br>
+    <input type="radio" name= "model" value="cnn_1layer"/> CNN (1 layer) <br>
+    <input type="radio" name= "model" value="xgboost"/> XGBoost <br>
+    <input type="file" name="fraud_data"></input><br>
+
+  <p><input type = "submit" value = "Submit" /></p> -->
+{% endblock content %}
