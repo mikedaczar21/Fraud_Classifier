@@ -13,17 +13,16 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
 
 from collections import Counter, defaultdict
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from uszipcode import SearchEngine   # Used to get geolocation information from zipcode
 from symspellpy.symspellpy import SymSpell, Verbosity  # Library to clean up misspelled words
 import pkg_resources
-from spellchecker import SpellChecker
+
 
 # Datetime imports
 import datetime
 from dateutil.relativedelta import relativedelta
 from datetime import date
-import xgboost as xgb
+
 
 from pathlib import Path
 from sklearn.model_selection import train_test_split
@@ -34,7 +33,7 @@ import re
 from collections import OrderedDict
 from text_processing_cleanup import replace_str, replace_str_general
 import shap
-import matplotlib.pylab as pl
+
 
 
 current_dir = os.path.abspath(os.path.curdir)
@@ -744,7 +743,7 @@ def get_Fraud_Dataset(**kwargs):
     text_xlsx_path = os.path.join(text_feature_path, text_xlsx_file_name)
 
 
-    print("Initial data path: {0} \n Local Fraud Data Path: {1} \n Feature Gen Path: {2}".format(init_data_path, fraud_data_path, feature_gen_data_path))
+    print("Initial data path: {0} \n Local Fraud Data Path: {1} \n Feature Gen Path: {2}".format(init_data_path, fraud_serial_path, feature_gen_data_path))
 
 
     if os.path.exists(feature_gen_data_path) and (recreate_features  == False):
@@ -775,8 +774,8 @@ def get_Fraud_Dataset(**kwargs):
 
 
 
-        with open(initial_large_data_df, 'rb') as read:
-            initial_large_data_df = dill.load(fraud_serial_path)
+        with open(fraud_serial_path, 'rb') as read:
+            initial_large_data_df = dill.load(read)
 
         print("Initial Large dataframe size before drop {}\n".format(len(initial_large_data_df)))
 
