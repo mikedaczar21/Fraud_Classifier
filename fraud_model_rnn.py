@@ -4,10 +4,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import shap
 
-
-
-from text_processing_cleanup import text_Processing, text_Processing_GloVe
-from data_feature_functions import create_indicator_matrix, get_Fraud_Dataset, print_class_report_confusion_matrix,  export_predictions
+from text_processing_cleanup import text_Processing
+from data_feature_functions import create_indicator_matrix, get_Fraud_Dataset, print_class_report_confusion_matrix
 from word_vector_functions import  read_glove_file
 from data_visualization import  plot_word_shap
 from Text_RNN import KerasTextClassifier, prepare_explanation_words
@@ -19,10 +17,15 @@ rand_state = 47 # random state of train/test split
 embedding_dim  = 200
 text_type = "Clean_Nums_2char"
 
+
+glove_sum = "VecAvg"
+recreate_full_xgb = False
+fraud_type= 'acceptance'
+
 if __name__ == '__main__':
 
 
-    fraud_data = get_Fraud_Dataset(recreate_features = False, fraud_type= 'acceptance')
+    fraud_data = get_Fraud_Dataset(recreate_features = False, fraud_type= fraud_type, correct_spelling = False)
 
 
     text = fraud_data['Fraud_Text'] # features or inputs into model
@@ -30,31 +33,8 @@ if __name__ == '__main__':
 
     labels_onehot = create_indicator_matrix(fraud_data['Fraud_Label'], check_index = True)
 
-
-
     cleaned_text = text.apply(text_Processing, numbers=False)
 
-    text_word_vec = text.apply(text_Processing_GloVe)
-
-    clean_list = cleaned_text.tolist()
-
-    clean_wordVec_list = text_word_vec.tolist()
-
-    glove_dict = read_glove_file(data_type = "accept", dimension = embedding_dim,  vocab_size = "4k", glove_type = text_type)
-
-
-
-    # text_train, text_test, label_train, label_test  = get_training_testing_data(features = cleaned_text,
-    #                                                         labels = labels,
-    #                                                         test_percentage =  test_percentage,
-    #                                                         rand_state = rand_state,
-    #                                                         data_type = "CNN_Text",
-    #                                                         recreate_train_test_data = False)
-
-
-
-
-    # clean_text_nums = text.apply(text_Processing, numbers=True)
 
     X_train, X_test, y_train, y_test = train_test_split(cleaned_text, labels, test_size = test_percentage , random_state = rand_state)
     max_doc_length = max([len(words.split(",")) for words in cleaned_text]) # 200 otherwise
@@ -74,19 +54,11 @@ if __name__ == '__main__':
     rnn_pred = rnn_text.predict(X_test)
     class_rnn =  print_class_report_confusion_matrix(y_test, rnn_pred, "RNN", "Glove Vectors")
 
-    # explainer = shap.DeepExplainer(rnn_text.model, encoded_x_train[:10])
-    # shap_values = explainer.shap_values(encoded_x_test[:1])
-    #
-    # # x_test_words = prepare_explanation_words(rnn_text, encoded_x_test)
-    #
-    #
-    # shap.force_plot(explainer.expected_value[0], shap_values[0][0], x_test_words[0])
 
-
-    attrib_data = encoded_x_train[100:300]
+    attrib_data = encoded_x_train[100:200]
     explainer = shap.DeepExplainer(rnn_text.model, attrib_data)
-    num_explanations = 20
-    start = 500
+    num_explanations = 10
+    start = 1000
     testing_set = encoded_x_test[start: start + num_explanations]
     shap_vals = explainer.shap_values(testing_set)
 
@@ -165,6 +137,8 @@ if __name__ == '__main__':
     max_accept = dict([(key,elem) for key, elem in max_fraud.items() if elem > 0])
 
     max_reject = dict([(key, abs(elem)) for key, elem in max_fraud.items() if elem <= 0])
+
+    impact_sorted = dict([(key,elem) for key, elem in max_impact.items() if elem > 0])
 
     max_accept_50 = dict( list(max_accept.items() )[:50] )
 

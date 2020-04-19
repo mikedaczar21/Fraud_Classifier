@@ -66,8 +66,7 @@ combined_feature_serial_name = "CNN_prob_combined_features"
 # Combining directories into absolute paths which functions can use
 
 init_data_path = os.path.abspath(os.path.join(current_dir, initial_data_dir))
-
-initial_large_data_df = os.path.join(init_data_path, "FraudData_Init.pk")
+fraud_serial_path = os.path.join(init_data_path, "FraudData_Init.pk")
 
 gis_file_name = "GIS_Data.pk"
 gis_data_path = os.path.join(init_data_path, gis_file_name)

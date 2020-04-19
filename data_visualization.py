@@ -140,7 +140,7 @@ def plot_word_shap(word_shap_dict, words_to_plot, plot_type):
     plt.show()
     plt.tight_layout()
 
-    fig_path = os.path.join(graph_dir, "{}__{}.png".format('RNN', plot_type))
+    fig_path = os.path.join(graph_dir, "{}_{}.png".format('RNN', plot_type))
     fig.savefig(fig_path)
 
 
