@@ -745,7 +745,7 @@ def get_Fraud_Dataset(**kwargs):
     print("Initial data path: {0} \n Local Fraud Data Path: {1} \n Feature Gen Path: {2}".format(init_data_path, fraud_serial_path, feature_gen_data_path))
 
 
-    if os.path.exists(feature_gen_data_path) and (recreate_features  == False):
+    if os.path.exists(feature_serial_path) and (recreate_features  == False):
 
         print("Loading features \n")
         # feature_data_df = pd.read_excel(feature_gen_data_path)
