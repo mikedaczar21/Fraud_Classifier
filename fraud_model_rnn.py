@@ -55,9 +55,9 @@ if __name__ == '__main__':
     class_rnn =  print_class_report_confusion_matrix(y_test, rnn_pred, "RNN", "Glove Vectors")
 
 
-    attrib_data = encoded_x_train[0:5000]
+    attrib_data = encoded_x_train[0:4000]
     explainer = shap.DeepExplainer(rnn_text.model, attrib_data)
-    num_explanations = 500
+    num_explanations = 400
     start = 0
     testing_set = encoded_x_test[start: start + num_explanations]
     shap_vals = explainer.shap_values(testing_set)
