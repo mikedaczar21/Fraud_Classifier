@@ -53,7 +53,7 @@ text_feature_path = os.path.abspath( os.path.join(feature_gen_data_dir, "Text_Da
 
 # Very important parameter for text feature (Glove vs Regular Training)
 text_feature_type = "GloVe"
-text_feature_type = "NoLossDate"
+text_feature_type = "NoLossDate_acceptance"
 
 
 num_classes = 2 # Number of different classes that is used for label
@@ -734,7 +734,7 @@ def get_Fraud_Dataset(**kwargs):
 
 
 
-    text_feature_file_name = "{}_feature_fraud.pk".format(fraud_type)
+    text_feature_file_name = "{}_{}_feature_fraud.pk".format(fraud_type, fraud_type)
     text_feature_glove = "glove_text_feature.pk"
     text_xlsx_file_name = "{}_text_feature.xlsx".format(fraud_type)
     text_feature_fraud_path = os.path.join(text_feature_path, text_feature_file_name)
