@@ -39,7 +39,14 @@ class KerasTextClassifier:
 
     OOV_TOKEN = "UnknownUnknown"
     # K.set_session(K.tf.Session(config=cfg))
-    K.set_session
+    
+    config = tf.ConfigProto(intra_op_parallelism_threads=NUM_PARALLEL_EXEC_UNITS,
+                        inter_op_parallelism_threads=2,
+                        allow_soft_placement=True,
+                        device_count = {'CPU': NUM_PARALLEL_EXEC_UNITS})
+
+    K.set_session(tf.Session(config=config))
+
 
     def __init__(self,
                  max_word_input, word_cnt, word_embedding_dimension, labels,
