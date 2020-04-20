@@ -56,11 +56,11 @@ if __name__ == '__main__':
 
 
     attrib_data = encoded_x_train[0:4000]
-    explainer = shap.DeepExplainer(rnn_text.model, encoded_x_train)
+    explainer = shap.DeepExplainer(rnn_text.model, attrib_data)
     num_explanations = 400
     start = 0
     testing_set = encoded_x_test[start: start + num_explanations]
-    shap_vals = explainer.shap_values(encoded_x_test)
+    shap_vals = explainer.shap_values(testing_set)
 
     x_test_words = prepare_explanation_words(rnn_text, encoded_x_test, start, num_explanations)
 
