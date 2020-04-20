@@ -39,7 +39,7 @@ class KerasTextClassifier:
 
     OOV_TOKEN = "UnknownUnknown"
     # K.set_session(K.tf.Session(config=cfg))
-    
+    NUM_PARALLEL_EXEC_UNITS = 2 # Number of cores per socket (use lscpu to get that number)
     config = tf.ConfigProto(intra_op_parallelism_threads=NUM_PARALLEL_EXEC_UNITS,
                         inter_op_parallelism_threads=2,
                         allow_soft_placement=True,
