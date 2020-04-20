@@ -41,9 +41,9 @@ if __name__ == '__main__':
 
     rnn_text = KerasTextClassifier(
         max_word_input= max_doc_length, word_cnt=4421, word_embedding_dimension=200,
-        labels=list(set(y_train)), batch_size=1024, epoch=12, validation_split=0.1)
+        labels=list(set(y_train)), batch_size=1024, epoch=14, validation_split=0.1)
 
-    rnn_text.fit(X_train, y_train, retrain_RNN = False,  model_type = "Glove_NoNumbers_MoreEpochs")
+    rnn_text.fit(X_train, y_train, retrain_RNN = False,  model_type = "Glove_NoNumbers_GCP")
 
     # print('Num of Word: %d' % len(rnn_text.tokenizer.word_index))
 
