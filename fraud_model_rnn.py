@@ -56,21 +56,22 @@ if __name__ == '__main__':
 
 
     attrib_data = encoded_x_train[100:200]
-    explainer = shap.DeepExplainer(rnn_text.model, attrib_data)
+    explainer = shap.DeepExplainer(rnn_text.model, encoded_x_train)
     num_explanations = 10
     start = 1000
     testing_set = encoded_x_test[start: start + num_explanations]
-    shap_vals = explainer.shap_values(testing_set)
+    shap_vals = explainer.shap_values(encoded_x_test)
 
     x_test_words = prepare_explanation_words(rnn_text, encoded_x_test, start, num_explanations)
 
 
     # shap.force_plot(explainer.expected_value[0], shap_vals[0][0], x_test_words[0],  matplotlib=True)
 
-    for row in range(num_explanations):
-        shap.force_plot(explainer.expected_value[1], shap_vals[1][row], x_test_words[row],  matplotlib=True)
-        shap.decision_plot(explainer.expected_value[1], shap_vals[1][row], x_test_words[row])
-
+    # ===== DECISION PLOTS AND FORCE PLOTS
+    # for row in range(num_explanations):
+    #     shap.force_plot(explainer.expected_value[1], shap_vals[1][row], x_test_words[row],  matplotlib=True)
+    #     shap.decision_plot(explainer.expected_value[1], shap_vals[1][row], x_test_words[row])
+    #
 
 
     # words = rnn_text.tokenizer.word_index
@@ -146,11 +147,11 @@ if __name__ == '__main__':
 
     max_impact_50 = dict( list(max_accept.items() )[:50] )
 
-    plot_word_shap(word_shap_dict = word_shap_accept, words_to_plot = max_accept_50, plot_type = 'Fraud Words')
+    plot_word_shap(word_shap_dict = word_shap_accept, words_to_plot = max_accept_50, plot_type = 'Fraud_Words_Full')
 
-    plot_word_shap(word_shap_dict = word_shap_accept,words_to_plot = max_reject_50, plot_type = 'Non-Fruad Words')
+    plot_word_shap(word_shap_dict = word_shap_accept,words_to_plot = max_reject_50, plot_type = 'Non_Fruad Words_Full')
 
-    plot_word_shap(word_shap_dict = word_shap_accept,words_to_plot = max_impact_50,  plot_type = 'Max Impact')
+    plot_word_shap(word_shap_dict = word_shap_accept,words_to_plot = max_impact_50,  plot_type = 'Max_Impact_Full')
 
     # word_shap_reject = {}
     # max_non_fraud = {}
