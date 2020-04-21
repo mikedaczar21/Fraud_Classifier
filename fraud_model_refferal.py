@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 
-from sklearn.preprocessing import StandardScaler
 from sklearn.utils import class_weight
 from collections import Counter
 from imblearn.over_sampling import ADASYN, SMOTE, RandomOverSampler
@@ -30,13 +29,17 @@ embedding_dim  = 100
 
 text_type = "Clean_2char_NoNums"
 glove_sum = "VecAvg"
-recreate_full_xgb = True
+recreate_full_xgb = False
+recreate_xgb_pred = True
 fraud_type= 'refferal' # fraud_type= 'acceptance' or 'refferal', refferal has all 79k claims
 
 if __name__ == '__main__':
 
 
     fraud_data = get_Fraud_Dataset(recreate_features = False, fraud_type= fraud_type, correct_spelling = False)
+
+    ref_rows = fraud_data[fraud_data['Fraud Referral'] == 'Yes'].index
+    fraud_data.drop(ref_rows, inplace=True)
 
     text = fraud_data['Fraud_Text'] # features or inputs into model
     labels = fraud_data['Fraud_Label'] # labels
@@ -147,63 +150,53 @@ if __name__ == '__main__':
 
 
     #### ===== ADDING SYNTHETIC FRAUD SAMPLES =====
-    print("Before OverSampling, counts of label '1': {}".format(sum(y_train_avg==1)))
-    print("Before OverSampling, counts of label '0': {} \n".format(sum(y_train_avg==0)))
-
-    over_sampling = SMOTE(random_state=777, k_neighbors=5)
-    X_train_oversamp, y_train_oversamp = over_sampling.fit_sample(X_train_avg, y_train_avg)
-
-
-    print('After OverSampling, the shape of train_X: {}'.format(X_train_oversamp.shape))
-    print('After OverSampling, the shape of train_y: {} \n'.format(y_train_oversamp.shape))
-
-    print("After OverSampling, counts of label '1': {}".format(sum(y_train_oversamp==1)))
-    print("After OverSampling, counts of label '0': {}".format(sum(y_train_oversamp==0)))
+    # print("Before OverSampling, counts of label '1': {}".format(sum(y_train_avg==1)))
+    # print("Before OverSampling, counts of label '0': {} \n".format(sum(y_train_avg==0)))
+    #
+    # over_sampling = SMOTE(random_state=777, k_neighbors=5)
+    # X_train_oversamp, y_train_oversamp = over_sampling.fit_sample(X_train_avg, y_train_avg)
+    #
+    #
+    # print('After OverSampling, the shape of train_X: {}'.format(X_train_oversamp.shape))
+    # print('After OverSampling, the shape of train_y: {} \n'.format(y_train_oversamp.shape))
+    #
+    # print("After OverSampling, counts of label '1': {}".format(sum(y_train_oversamp==1)))
+    # print("After OverSampling, counts of label '0': {}".format(sum(y_train_oversamp==0)))
 
 
 
     X_val_avg, X_test_avg, y_val_avg, y_test_avg = train_test_split(X_test_val_avg, y_test_val_avg, test_size = 0.5, random_state = 23)
 
-    X_val_expand, X_test_expand, y_val_expand, y_test_expand = train_test_split(X_test_val_expand, y_test_val_expand, test_size =  0.5, random_state = 23)
+    # X_val_expand, X_test_expand, y_val_expand, y_test_expand = train_test_split(X_test_val_expand, y_test_val_expand, test_size =  0.5, random_state = 23)
 
     X_val_orig, X_test_orig, y_val_orig, y_test_val_orig = train_test_split(X_test_val_orig, y_test_val_orig, test_size =  0.5, random_state = 23)
 
-
-    perfrom_RandomSearch(
-                      X_train = X_train_avg, X_test = X_val_avg,
-                      y_train = y_train_avg, y_test = y_val_avg,
-                      ensemble_type = "boost"
-                      )
-
-
-    perfrom_RandomSearch(
-                      X_train = X_train_oversamp, X_test = X_val_avg,
-                      y_train = y_train_oversamp, y_test = y_val_avg,
-                      ensemble_type = "boost"
-                      )
 
 
 
     #### ====== TRAINING XGBOOST MODEL AND EXPORTING PREDICTIONS TO EXCEL FILE  ======
 
-    boost_pred, boost_prob, boost_model, boost_pred_path = train_boosting_ensemble(X_train_avg, X_test_avg, y_train_avg, y_test_avg,
+    boost_pred, boost_prob, boost_model, boost_pred_path = train_boosting_ensemble(X_train_avg, new_feat_avg, y_train_avg, new_feature_labels,
                                                                                   boosting_type= "xgboost_{}_FullData".format( 'VecAvg'),
-                                                                                  recreate_model= recreate_full_xgb, model_type = 'imbalanced')
+                                                                                  recreate_model= recreate_full_xgb, model_type = 'imbalanced',
+                                                                                  fraud_type = 'acceptance')
 
     # boost_pred_expand, boost_prob_expand, boost_model_expand, boost_pred_path_expand = train_boosting_ensemble(X_train_expand, X_test_expand, y_train_expand, y_test_expand,
     #                                                                               boosting_type= "xgboost_Glove{}_FullData".format( 'Expand'),
-    #                                                                               recreate_model= recreate_full_xgb, model_type = 'imbalanced')
+    #                                                                               recreate_model= recreate_full_xgb, model_type = 'imbalanced',
+    #                                                                               fraud_type = 'refferal')
 
-    boost_pred_oversamp, boost_prob_oversamp, boost_model_oversamp, boost_pred_path_oversamp = train_boosting_ensemble(X_train_oversamp, X_test_avg, y_train_oversamp, y_test_avg,
-                                                                                  boosting_type= "xgboost_Glove{}_FullData".format( 'Oversamp'),
-                                                                                  recreate_model= recreate_full_xgb, model_type = 'balanced')
+    # boost_pred_oversamp, boost_prob_oversamp, boost_model_oversamp, boost_pred_path_oversamp = train_boosting_ensemble(X_train_oversamp, X_test_avg, y_train_oversamp, y_test_avg,
+    #                                                                               boosting_type= "xgboost_Glove{}_FullData".format( 'Oversamp'),
+    #                                                                               recreate_model= recreate_full_xgb, model_type = 'balanced',
+    #                                                                               fraud_type = 'refferal')
 
 
-    class_xgb =  print_class_report_confusion_matrix(y_test_avg, boost_pred, "XGBoost", "Glove Sum Full Testing Eval")
-
+    # class_xgb =  print_class_report_confusion_matrix(new_feature_labels, boost_pred, "XGBoost", "Glove Sum Full Testing Eval")
+    #
     # class_xgb_expand =  print_class_report_confusion_matrix(y_test_expand, boost_pred_expand, "XGBoost", "Glove Expand Full Testing Eval")
-
-    class_xgb_oversamp =  print_class_report_confusion_matrix(y_test_avg, boost_pred_oversamp, "XGBoost", "Glove Synthetic Oversampled Testing Eval")
+    #
+    # class_xgb_oversamp =  print_class_report_confusion_matrix(y_test_avg, boost_pred_oversamp, "XGBoost", "Glove Synthetic Oversampled Testing Eval")
 
     expand_out =  fraud_data.join(sent_embed_df, how="inner", lsuffix='_left')
 
@@ -226,11 +219,42 @@ if __name__ == '__main__':
                       fraud_data,
                       boost_prob,
                       boost_pred,
-                      actual= y_test_avg,
-                      recreate_ProbPreds = True,
+                      actual= new_feature_labels,
+                      recreate_ProbPreds = recreate_xgb_pred,
                       pred_path = boost_pred_path,
                       file_name = 'XGBoost_{}_{}{}_FullData'.format(fraud_type, text_type, glove_sum),
                       model_type ='XGBoost')
+
+
+
+    #### ====== PLOTTING MODEL OUTPUTS =======
+    plot_data_points = { 'x':boost_out['Actual Label'] , 'y':boost_out['XGBoost_Predictions'] , 'z': boost_out['XGBoost_Confid_Prob'] * 100.00}
+    plot_3d(model_output= boost_out,  data_points = plot_data_points, fig_type = "Boost_FullData_Actual_Pred_Prob", model_type = "XGBoost",  z_label = "Probability Fraud (%)")
+
+
+    # plot_data_points = { 'x':boost_out['Actual Label'] , 'y':boost_out['XGBoost_Predictions'] , 'z': boost_out['Claim_Loss'] }
+    # plot_3d(model_output= boost_out,  data_points = plot_data_points, fig_type = "Boost_Full_Actual_Pred_ClaimLoss", model_type = "XGBoost", z_label = "Days Between Policy Loss - Claim")
+
+
+    # get_feature_importance(model = boost_model,
+    #                        features = X_test_avg,
+    #                        feature_names = list(X_test_avg.columns),
+    #                        orig_feat = X_test_orig,
+    #                        model_type = "XGBoost",
+    #                        plot = 'decision')
+
+
+
+    get_feature_importance_pred(
+                            model = boost_model,
+                            features = new_feat_avg,
+                            model_out = boost_out,
+                            feature_names = list(new_feat_avg.columns),
+                            orig_feat = new_feat_orig,
+                            model_type = "XGBoost",
+                            plot = 'decision')
+
+
     # #### ====== PLOTTING MODEL OUTPUTS =======
     # plot_data_points = { 'x':boost_out['Actual Label'] , 'y':boost_out['XGBoost_Predictions'] , 'z': boost_out['XGBoost_Confid_Prob'] * 100.00}
     # plot_3d(model_output= boost_out,  data_points = plot_data_points, fig_type = "Boost_FullData_Actual_Pred_Prob", model_type = "XGBoost",  z_label = "Probability Fraud (%)")
