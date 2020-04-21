@@ -177,9 +177,9 @@ if __name__ == '__main__':
     #### ====== TRAINING XGBOOST MODEL AND EXPORTING PREDICTIONS TO EXCEL FILE  ======
 
     boost_pred, boost_prob, boost_model, boost_pred_path = train_boosting_ensemble(X_train_avg, new_feat_avg, y_train_avg, new_feature_labels,
-                                                                                  boosting_type= "xgboost_{}_FullData".format( 'VecAvg'),
+                                                                                  boosting_type= "xgboost_{}test_{}_FullData".format(38, 'VecAvg'),
                                                                                   recreate_model= recreate_full_xgb, model_type = 'imbalanced',
-                                                                                  fraud_type = 'acceptance')
+                                                                                    )
 
     # boost_pred_expand, boost_prob_expand, boost_model_expand, boost_pred_path_expand = train_boosting_ensemble(X_train_expand, X_test_expand, y_train_expand, y_test_expand,
     #                                                                               boosting_type= "xgboost_Glove{}_FullData".format( 'Expand'),
@@ -222,7 +222,7 @@ if __name__ == '__main__':
                       actual= new_feature_labels,
                       recreate_ProbPreds = recreate_xgb_pred,
                       pred_path = boost_pred_path,
-                      file_name = 'XGBoost_{}_{}{}_FullData'.format(fraud_type, text_type, glove_sum),
+                      file_name = 'XGBoost_{}_{}_FullData'.format(fraud_type,  glove_sum),
                       model_type ='XGBoost')
 
 
