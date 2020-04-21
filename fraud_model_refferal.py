@@ -222,7 +222,7 @@ if __name__ == '__main__':
                       actual= new_feature_labels,
                       recreate_ProbPreds = recreate_xgb_pred,
                       pred_path = boost_pred_path,
-                      file_name = 'XGBoost_{}_{}_FullData'.format(fraud_type,  glove_sum),
+                      file_name = 'XGBoost_{}_{}_FullData'.format(fraud_type, glove_sum),
                       model_type ='XGBoost')
 
 

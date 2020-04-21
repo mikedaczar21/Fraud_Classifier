@@ -266,8 +266,8 @@ def export_predictions( features, prob, pred , actual, recreate_ProbPreds, pred_
         # output_pred[model_pred_header] = output_pred[  model_pred_header].replace(0, "Rejected")
 
 
-        with open(combined_ProbPred_serialized_path, 'wb') as write:
-            dill.dump(output_pred, write)
+        # with open(combined_ProbPred_serialized_path, 'wb') as write:
+        #     dill.dump(output_pred, write)
 
         with pd.ExcelWriter(combined_ProbPred_xlsx_path) as xlsx_writer:
             output_pred.to_excel(xlsx_writer, "Pred_Prob_{}".format(model_type), header=True, index_label= False)
