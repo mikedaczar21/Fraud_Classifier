@@ -15,21 +15,21 @@ import category_encoders as ce
 
 
 from text_processing_cleanup import text_Processing, text_Processing_GloVe
-from data_feature_functions import create_indicator_matrix, get_Fraud_Dataset,get_training_testing_data, get_Geolocation_Data, print_class_report_confusion_matrix, get_combined_feature, export_predictions
+from data_feature_functions import create_indicator_matrix, get_Fraud_Dataset, get_training_testing_data, print_class_report_confusion_matrix, get_combined_feature, export_predictions
 from predict_CNN_1layer import get_cnn_pred_prob, evaluate_cnn
 from ensemble_classifier import train_bagging_ensemble, train_boosting_ensemble, perfrom_GridSearch, perfrom_RandomSearch
 from word_vector_functions import  load_word2vec, get_sentence_feature_values, read_glove_file, get_sentence_embeddings
-from get_classifier_models import get_classifier_predictions_probabilities
+# from get_classifier_models import get_classifier_predictions_probabilities
 from data_visualization import plot_3d, get_feature_importance,  get_feature_importance_pred
 
 
-test_size = 38 # out of 100 percent for train-test split
-test_percentage = float(test_size / 100.00)
+test_val_size = 40 # out of 100 percent for train-test split
+test_val_percent = float(test_val_size / 100.00)
 rand_state = 47 # random state of train/test split
-embedding_dim  = 200
+embedding_dim  = 100
 
 
-text_type = "Clean_Nums_2char"
+text_type = "Clean_2char_NoNums"
 glove_sum = "VecAvg"
 recreate_full_xgb = True
 fraud_type= 'refferal' # fraud_type= 'acceptance' or 'refferal', refferal has all 79k claims
@@ -37,7 +37,7 @@ fraud_type= 'refferal' # fraud_type= 'acceptance' or 'refferal', refferal has al
 if __name__ == '__main__':
 
 
-    fraud_data = get_Fraud_Dataset(recreate_features = True, fraud_type= fraud_type, correct_spelling = True)
+    fraud_data = get_Fraud_Dataset(recreate_features = False, fraud_type= fraud_type, correct_spelling = False)
 
     text = fraud_data['Fraud_Text'] # features or inputs into model
     labels = fraud_data['Fraud_Label'] # labels
@@ -46,14 +46,14 @@ if __name__ == '__main__':
 
     cleaned_text = text.apply(text_Processing, numbers=False)
 
-    text_word_vec = text.apply(text_Processing_GloVe)
+    text_word_vec = text.apply(text_Processing_GloVe, numbers=False)
 
     clean_list = cleaned_text.tolist()
 
     clean_wordVec_list = text_word_vec.tolist()
 
 
-    glove_dict = read_glove_file(data_type = "accept", dimension = embedding_dim,  vocab_size = "4k", glove_type = text_type)
+    glove_dict = read_glove_file(data_type = "refferal", dimension = embedding_dim,  vocab_size = "15k", glove_type = text_type)
 
 
     new_feat_avg = fraud_data.loc[:, 'Loss_PolicyEff':'Claim_Loss',] # Datediff features + fraud text
@@ -76,12 +76,9 @@ if __name__ == '__main__':
     # Encoding main/sub cause columns
     encoder = ce.leave_one_out.LeaveOneOutEncoder(cols = ['Cause',  'Sub_Business', 'New_Main', 'New_Sub'])
 
-
     # encoder = ce.BackwardDifferenceEncoder(cols = ['New_Main', 'New_Sub'])
 
     fraud_data = encoder.fit_transform(X=fraud_data, y=fraud_data['Fraud_Label'])
-
-
 
     feature_cols = [
 
@@ -150,18 +147,18 @@ if __name__ == '__main__':
 
     ####  ====== TRAIN-TEST SPLIT   ======
 
-    X_train_avg, X_test_avg, y_train_avg, y_test_avg = train_test_split(new_feat_avg, new_feature_labels, test_size = test_percentage, random_state = rand_state)
+    X_train_avg, X_test_val_avg, y_train_avg, y_test_val_avg = train_test_split(new_feat_avg, new_feature_labels, test_size = test_val_percent, random_state = rand_state)
 
-    X_train_expand, X_test_expand, y_train_expand, y_test_expand = train_test_split(new_feature_expand, new_feature_labels, test_size = test_percentage, random_state = rand_state)
+    X_train_expand, X_test_val_expand, y_train_expand, y_test_val_expand = train_test_split(new_feature_expand, new_feature_labels, test_size = test_val_percent, random_state = rand_state)
 
-    X_train_orig, X_test_orig, y_train_orig, y_test_orig = train_test_split(new_feat_orig, new_feature_labels, test_size = test_percentage, random_state = rand_state)
+    X_train_orig, X_test_val_orig, y_train_orig, y_test_val_orig = train_test_split(new_feat_orig, new_feature_labels, test_size = test_val_percent, random_state = rand_state)
 
 
     #### ===== ADDING SYNTHETIC FRAUD SAMPLES =====
     print("Before OverSampling, counts of label '1': {}".format(sum(y_train_avg==1)))
     print("Before OverSampling, counts of label '0': {} \n".format(sum(y_train_avg==0)))
 
-    over_sampling = SMOTE(random_state=777, k_neighbors=2)
+    over_sampling = SMOTE(random_state=777, k_neighbors=5)
     X_train_oversamp, y_train_oversamp = over_sampling.fit_sample(X_train_avg, y_train_avg)
 
 
@@ -172,50 +169,68 @@ if __name__ == '__main__':
     print("After OverSampling, counts of label '0': {}".format(sum(y_train_oversamp==0)))
 
 
+
+    X_val_avg, X_test_avg, y_val_avg, y_test_avg = train_test_split(X_test_val_avg, y_test_val_avg, test_size = 0.5, random_state = 23)
+
+    X_val_expand, X_test_expand, y_val_expand, y_test_expand = train_test_split(X_test_val_expand, y_test_val_expand, test_size =  0.5, random_state = 23)
+
+    X_val_orig, X_test_orig, y_val_orig, y_test_val_orig = train_test_split(X_test_val_orig, y_test_val_orig, test_size =  0.5, random_state = 23)
+
+
+    perfrom_RandomSearch(
+                      X_train = X_train_avg, X_test = X_val_avg,
+                      y_train = y_train_avg, y_test = y_val_avg,
+                      ensemble_type = "boost"
+                      )
+
+
     #### ====== TRAINING XGBOOST MODEL AND EXPORTING PREDICTIONS TO EXCEL FILE  ======
 
     boost_pred, boost_prob, boost_model, boost_pred_path = train_boosting_ensemble(X_train_avg, X_test_avg, y_train_avg, y_test_avg,
-                                                                                  boosting_type= "xgboost_{}test_{}_FullData".format(test_size, 'VecAvg'),
+                                                                                  boosting_type= "xgboost_{}_FullData".format( 'VecAvg'),
                                                                                   recreate_model= recreate_full_xgb, model_type = 'imbalanced')
 
     boost_pred_expand, boost_prob_expand, boost_model_expand, boost_pred_path_expand = train_boosting_ensemble(X_train_expand, X_test_expand, y_train_expand, y_test_expand,
-                                                                                  boosting_type= "xgboost_{}test_Glove{}_FullData".format(test_size, 'Expand'),
+                                                                                  boosting_type= "xgboost_Glove{}_FullData".format( 'Expand'),
                                                                                   recreate_model= recreate_full_xgb, model_type = 'imbalanced')
 
     boost_pred_oversamp, boost_prob_oversamp, boost_model_oversamp, boost_pred_path_oversamp = train_boosting_ensemble(X_train_oversamp, X_test_avg, y_train_oversamp, y_test_avg,
-                                                                                  boosting_type= "xgboost_{}test_Glove{}_FullData".format(test_size, 'Oversamp'),
+                                                                                  boosting_type= "xgboost_Glove{}_FullData".format( 'Oversamp'),
                                                                                   recreate_model= recreate_full_xgb, model_type = 'balanced')
 
 
-    class_xgb =  print_class_report_confusion_matrix(y_test_avg, boost_pred, "XGBoost", "Glove Sum Full Data")
-
-    class_xgb_expand =  print_class_report_confusion_matrix(y_test_expand, boost_pred_expand, "XGBoost", "Glove Expand Full Data")
-
-    class_xgb_oversamp =  print_class_report_confusion_matrix(y_test_avg, boost_pred_oversamp, "XGBoost", "Glove Synthetic Oversampled Full Data")
+    # class_xgb =  print_class_report_confusion_matrix(y_test_avg, boost_pred, "XGBoost", "Glove Sum Full Testing Eval")
+    #
+    # class_xgb_expand =  print_class_report_confusion_matrix(y_test_expand, boost_pred_expand, "XGBoost", "Glove Expand Full Testing Eval")
+    #
+    # class_xgb_oversamp =  print_class_report_confusion_matrix(y_test_avg, boost_pred_oversamp, "XGBoost", "Glove Synthetic Oversampled Testing Eval")
 
     expand_out =  fraud_data.join(sent_embed_df, how="inner", lsuffix='_left')
 
 
     # perfrom_RandomSearch(
-    #                   X_train = X_train, X_test = X_test,
-    #                   y_train = y_train, y_test = y_test,
+    #                   X_train = X_train_avg, X_test = X_val_avg,
+    #                   y_train = y_train_avg, y_test = y_val_avg,
     #                   ensemble_type = "boost"
     #                   )
     #
+    # perfrom_RandomSearch(
+    #                   X_train = X_train_expand, X_test = X_val_expand,
+    #                   y_train = y_train_expand, y_test = y_val_expand,
+    #                   ensemble_type = "boost"
+    #                   )
 
 
-    # boost_out = export_predictions(
-    #                   fraud_data,
-    #                   boost_prob,
-    #                   boost_pred,
-    #                   actual= y_test_avg,
-    #                   recreate_ProbPreds = False,
-    #                   pred_path = boost_pred_path,
-    #                   file_name = 'XGBoost_Output_{}test_{}{}_FullData'.format(test_size, text_type, glove_sum),
-    #                   model_type ='XGBoost')
-    #
-    #
-    #
+
+    boost_out = export_predictions(
+                      fraud_data,
+                      boost_prob,
+                      boost_pred,
+                      actual= y_test_avg,
+                      recreate_ProbPreds = True,
+                      pred_path = boost_pred_path,
+                      file_name = 'XGBoost_{}_{}{}_FullData'.format(fraud_type, text_type, glove_sum),
+                      model_type ='XGBoost')
     # #### ====== PLOTTING MODEL OUTPUTS =======
     # plot_data_points = { 'x':boost_out['Actual Label'] , 'y':boost_out['XGBoost_Predictions'] , 'z': boost_out['XGBoost_Confid_Prob'] * 100.00}
     # plot_3d(model_output= boost_out,  data_points = plot_data_points, fig_type = "Boost_FullData_Actual_Pred_Prob", model_type = "XGBoost",  z_label = "Probability Fraud (%)")

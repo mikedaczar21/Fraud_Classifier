@@ -734,7 +734,7 @@ def get_Fraud_Dataset(**kwargs):
 
 
 
-    text_feature_file_name = "{}_{}_feature_fraud.pk".format(fraud_type, fraud_type)
+    text_feature_file_name = "{}_feature_fraud.pk".format(fraud_type)
     text_feature_glove = "glove_text_feature.pk"
     text_xlsx_file_name = "{}_text_feature.xlsx".format(fraud_type)
     text_feature_fraud_path = os.path.join(text_feature_path, text_feature_file_name)
@@ -753,7 +753,7 @@ def get_Fraud_Dataset(**kwargs):
         with open(feature_serial_path, 'rb') as read:
             feature_data_df = dill.load(read)
 
-        feature_data_df = feature_data_df.drop(['Unnamed: 0'], axis=1)
+        # feature_data_df = feature_data_df.drop(['Unnamed: 0'], axis=1)
 
 
 
