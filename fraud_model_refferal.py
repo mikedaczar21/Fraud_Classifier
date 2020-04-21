@@ -5,7 +5,6 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 
 from sklearn.preprocessing import StandardScaler
-from tabulate import tabulate
 from sklearn.utils import class_weight
 from collections import Counter
 from imblearn.over_sampling import ADASYN, SMOTE, RandomOverSampler
