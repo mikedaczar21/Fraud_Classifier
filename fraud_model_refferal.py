@@ -184,26 +184,34 @@ if __name__ == '__main__':
                       )
 
 
+    perfrom_RandomSearch(
+                      X_train = X_train_oversamp, X_test = X_val_avg,
+                      y_train = y_train_oversamp, y_test = y_val_avg,
+                      ensemble_type = "boost"
+                      )
+
+
+
     #### ====== TRAINING XGBOOST MODEL AND EXPORTING PREDICTIONS TO EXCEL FILE  ======
 
     boost_pred, boost_prob, boost_model, boost_pred_path = train_boosting_ensemble(X_train_avg, X_test_avg, y_train_avg, y_test_avg,
                                                                                   boosting_type= "xgboost_{}_FullData".format( 'VecAvg'),
                                                                                   recreate_model= recreate_full_xgb, model_type = 'imbalanced')
 
-    boost_pred_expand, boost_prob_expand, boost_model_expand, boost_pred_path_expand = train_boosting_ensemble(X_train_expand, X_test_expand, y_train_expand, y_test_expand,
-                                                                                  boosting_type= "xgboost_Glove{}_FullData".format( 'Expand'),
-                                                                                  recreate_model= recreate_full_xgb, model_type = 'imbalanced')
+    # boost_pred_expand, boost_prob_expand, boost_model_expand, boost_pred_path_expand = train_boosting_ensemble(X_train_expand, X_test_expand, y_train_expand, y_test_expand,
+    #                                                                               boosting_type= "xgboost_Glove{}_FullData".format( 'Expand'),
+    #                                                                               recreate_model= recreate_full_xgb, model_type = 'imbalanced')
 
     boost_pred_oversamp, boost_prob_oversamp, boost_model_oversamp, boost_pred_path_oversamp = train_boosting_ensemble(X_train_oversamp, X_test_avg, y_train_oversamp, y_test_avg,
                                                                                   boosting_type= "xgboost_Glove{}_FullData".format( 'Oversamp'),
                                                                                   recreate_model= recreate_full_xgb, model_type = 'balanced')
 
 
-    # class_xgb =  print_class_report_confusion_matrix(y_test_avg, boost_pred, "XGBoost", "Glove Sum Full Testing Eval")
-    #
+    class_xgb =  print_class_report_confusion_matrix(y_test_avg, boost_pred, "XGBoost", "Glove Sum Full Testing Eval")
+
     # class_xgb_expand =  print_class_report_confusion_matrix(y_test_expand, boost_pred_expand, "XGBoost", "Glove Expand Full Testing Eval")
-    #
-    # class_xgb_oversamp =  print_class_report_confusion_matrix(y_test_avg, boost_pred_oversamp, "XGBoost", "Glove Synthetic Oversampled Testing Eval")
+
+    class_xgb_oversamp =  print_class_report_confusion_matrix(y_test_avg, boost_pred_oversamp, "XGBoost", "Glove Synthetic Oversampled Testing Eval")
 
     expand_out =  fraud_data.join(sent_embed_df, how="inner", lsuffix='_left')
 

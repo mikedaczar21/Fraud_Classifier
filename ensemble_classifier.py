@@ -247,7 +247,7 @@ def perfrom_RandomSearch(X_train, X_test, y_train,  y_test, ensemble_type):
 
         xgb_model = xgb.XGBClassifier()
         # Use ROC for scoring if balanced, otherwise better to use precision-recall curve
-        search = RandomizedSearchCV(estimator = xgb_model, param_distributions=params, random_state=56, n_iter=100, cv=5, scoring='roc_auc', verbose=1, n_jobs=4, return_train_score=True)
+        search = RandomizedSearchCV(estimator = xgb_model, param_distributions=params, random_state=56, n_iter=50, cv=5, scoring='roc_auc', verbose=1, n_jobs=4, return_train_score=True)
         search.fit(X_train, y_train)
 
         random_best = search.best_estimator_
