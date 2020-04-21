@@ -45,13 +45,6 @@ if __name__ == '__main__':
 
     cleaned_text = text.apply(text_Processing, numbers=False)
 
-    text_word_vec = text.apply(text_Processing_GloVe, numbers=False)
-
-    clean_list = cleaned_text.tolist()
-
-    clean_wordVec_list = text_word_vec.tolist()
-
-
     glove_dict = read_glove_file(data_type = "refferal", dimension = embedding_dim,  vocab_size = "15k", glove_type = text_type)
 
 
