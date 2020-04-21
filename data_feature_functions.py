@@ -218,11 +218,13 @@ def export_predictions( features, prob, pred , actual, recreate_ProbPreds, pred_
     combined_ProbPred_excel_full = file_name  + ".xlsx"
     combined_ProbPred_serial_full = file_name  + ".pk"
 
-    combined_ProbPred_xlsx_path = os.path.join(pred_path, combined_ProbPred_excel_full)
-    combined_ProbPred_serialized_path = os.path.join(pred_path, combined_ProbPred_serial_full)
+
+    combined_ProbPred_xlsx_path = os.path.join(current_dir, combined_ProbPred_excel_full)
+    combined_ProbPred_serialized_path = os.path.join(current_dir, combined_ProbPred_serial_full)
 
     combined_xlsx_exists = os.path.exists(combined_ProbPred_xlsx_path)
     combined_serial_exists = os.path.exists(combined_ProbPred_serialized_path )
+    print("Output XGB Serial Path: {}".format(combined_ProbPred_serialized_path))
 
     if (combined_serial_exists == True) and (combined_xlsx_exists == True ) and (recreate_ProbPreds == True):
         os.remove(combined_ProbPred_xlsx_path)
@@ -266,8 +268,8 @@ def export_predictions( features, prob, pred , actual, recreate_ProbPreds, pred_
         # output_pred[model_pred_header] = output_pred[  model_pred_header].replace(0, "Rejected")
 
 
-        # with open(combined_ProbPred_serialized_path, 'wb') as write:
-        #     dill.dump(output_pred, write)
+        with open(combined_ProbPred_serialized_path, 'wb') as write:
+            dill.dump(output_pred, write)
 
         with pd.ExcelWriter(combined_ProbPred_xlsx_path) as xlsx_writer:
             output_pred.to_excel(xlsx_writer, "Pred_Prob_{}".format(model_type), header=True, index_label= False)
