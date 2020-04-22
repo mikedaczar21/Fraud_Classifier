@@ -272,7 +272,7 @@ def export_predictions( features, prob, pred , actual, recreate_ProbPreds, pred_
             dill.dump(output_pred, write)
 
         with pd.ExcelWriter(combined_ProbPred_xlsx_path) as xlsx_writer:
-            output_pred.to_excel(xlsx_writer, "Pred_Prob_{}".format(model_type), header=True, index_label= False)
+            output_pred.to_excel(xlsx_writer, "Confidence_{}".format(model_type), header=True, index_label= False)
             xlsx_writer.save()
 
 

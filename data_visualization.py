@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
@@ -96,7 +98,7 @@ def plot_3d(model_output, data_points, fig_type, model_type, z_label):
     # ax.yaxis.set_major_locator(MultipleLocator(100))
     # ax.yaxis.set_minor_locator(MultipleLocator(50))
 
-    fig_path = os.path.join(graph_dir, "{}_Confidence_{}.png".format(model_type, fig_type))
+    fig_path = os.path.join(graph_dir, "{}_Confidence_{}_RefTest.png".format(model_type, fig_type))
     plt.savefig(fig_path, transparent=True)
 
 
