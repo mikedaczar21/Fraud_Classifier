@@ -17,7 +17,7 @@ keras==2.1.6
 keras-applications==1.0.2
 keras-preprocessing==1.0.1
 markdown==3.0.1
-numpy==1.17.2
+numpy==1.22.0
 pathlib-mate==0.0.15
 pip==20.0.2
 protobuf==3.6.1
