@@ -12,7 +12,7 @@ geopy==1.20.0
 grpcio==1.18.0
 imbalanced-learn==0.6.2
 jmespath==0.9.5
-joblib==0.13.2
+joblib==1.2.0
 keras==2.1.6
 keras-applications==1.0.2
 keras-preprocessing==1.0.1
