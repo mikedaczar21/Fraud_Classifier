@@ -20,7 +20,7 @@ markdown==3.0.1
 numpy==1.17.2
 pathlib-mate==0.0.15
 pip==20.0.2
-protobuf==3.6.1
+protobuf==3.18.3
 pyspellchecker==0.5.4
 requests==2.9.1
 setuptools==46.1.3
